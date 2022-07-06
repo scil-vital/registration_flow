@@ -45,6 +45,16 @@ workflow.onComplete {
 log.info "Input: $params.input"
 root = file(params.input)
 
+if (params.registration_speed == 1){
+    registration_script = Channel.value("antsRegistrationSyNQuick.sh")
+}
+else if (params.registration_speed == 0){
+    registration_script = Channel.value("antsRegistrationSyN.sh")
+}
+else {
+    error "Registration speed must be 0 or 1"
+}
+
 Channel
     .fromFilePairs("$root/**/bundles/*.trk", size: -1) { it.parent.parent.name }
     .set{ tractogram } // [sid, tractogram.trk]
@@ -58,6 +68,7 @@ target_anat = Channel.fromPath("$params.target_anat")
 
 reference
     .combine(target_anat)
+    .combine(registration_script)
     .set{reference_target_anat} 
 
 process Register_Anat {
@@ -65,7 +76,7 @@ process Register_Anat {
     memory '2 GB'
 
     input:
-    set sid, file(reference), file(target_anat) from reference_target_anat
+    set sid, file(reference), file(target_anat), val(registration_script) from reference_target_anat
 
     output:
     // [sid, affine.mat, inverseWarp.nii.gz, fixed_t1.nii.gz]
@@ -76,7 +87,7 @@ process Register_Anat {
     script:
     """
     export ANTS_RANDOM_SEED=1234
-    antsRegistrationSyNQuick.sh -d 3 -f ${target_anat} -m ${reference} -o ${sid}__output -t s -n ${params.register_processes}
+    ${registration_script} -d 3 -f ${target_anat} -m ${reference} -o ${sid}__output -t s -n ${params.register_processes}
     """
 }
 

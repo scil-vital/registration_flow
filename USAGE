@@ -30,6 +30,9 @@ DESCRIPTION
 
     --output_dir                            Directory where to write the final results.
                                             By default, will be in "./results"
+                                            
+    --registration_speed                    Registration speed 0 = antsRegsitrationSyN.sh, 1 = antsRegsitrationSyNQuick.sh
+                                            Default: (1) -> Using: ($registration_speed)
 
 NOTES
 
