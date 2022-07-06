@@ -6,7 +6,8 @@ if(params.help) {
 
     bindings = ["register_processes":"$params.register_processes",
                 "cpu_count":"$cpu_count",
-                "resampling": "$params.resampling"]
+                "resampling": "$params.resampling",
+                "registration_speed":"$params.registration_speed"]
 
     engine = new groovy.text.SimpleTemplateEngine()
     template = engine.createTemplate(usage.text).make(bindings)
