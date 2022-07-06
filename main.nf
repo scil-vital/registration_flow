@@ -83,6 +83,7 @@ process Register_Anat {
     // [sid, affine.mat, inverseWarp.nii.gz, fixed_t1.nii.gz]
     set sid, "${sid}__output0GenericAffine.mat", "${sid}__output1InverseWarp.nii.gz", "${target_anat}" into transformation_for_tractogram
     file "${sid}__outputWarped.nii.gz"
+    file "${sid}__outputInverseWarped.nii.gz"
     file "${sid}__output1Warp.nii.gz"
 
     script:
