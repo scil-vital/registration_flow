@@ -1,0 +1,38 @@
+Pipeline for FINTA MultiBundle
+======================================
+
+USAGE
+
+nextflow run main.nf --input ... [OPTIONAL_ARGUMENTS]
+
+
+DESCRIPTION
+
+    --input=/path/to/[root]              Root folder containing multiple subjects
+
+                                        [root]
+                                        ├── S1
+                                        │   ├── metrics
+                                        |   |   └── t1.nii.gz
+                                        │   └── bundles
+                                        |       └── *.trk
+                                        └── S2
+                                            └── *
+
+    --target_anat                        Path to reference anatomy of the atlas
+
+    OPTIONAL ARGUMENTS (current value)
+
+    --register_processes                    Number of processes for registration task ($register_processes).
+    --resampling                            Resample streamline to a fixe number of points ($resampling).
+    --processes                             The number of parallel processes to launch ($cpu_count).
+                                            Only affects the local scheduler.
+
+    --output_dir                            Directory where to write the final results.
+                                            By default, will be in "./results"
+
+NOTES
+
+Use '-C config_file.config' to specify a non-default configuration file.
+The '-C config_file.config' must be inserted after the nextflow call
+like 'nextflow -C config_file.config run ...'.
