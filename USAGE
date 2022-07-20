@@ -24,7 +24,8 @@ DESCRIPTION
     OPTIONAL ARGUMENTS (current value)
 
     --register_processes                    Number of processes for registration task ($register_processes).
-    --resampling                            Resample streamline to a fixe number of points ($resampling).
+    --resampling_streamlines                Resample streamlines to a fixe number of points ($resampling_streamlines).
+    --resampling_tractograms                Resample tractograms to a fixe number of streamlines ($resampling_tractograms).
     --processes                             The number of parallel processes to launch ($cpu_count).
                                             Only affects the local scheduler.
 

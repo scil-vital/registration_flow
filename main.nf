@@ -6,7 +6,8 @@ if(params.help) {
 
     bindings = ["register_processes":"$params.register_processes",
                 "cpu_count":"$cpu_count",
-                "resampling": "$params.resampling",
+                "resampling_streamlines": "$params.resampling_streamlines",
+                "resampling_tractograms": "$params.resampling_tractograms",
                 "registration_speed":"$params.registration_speed"]
 
     engine = new groovy.text.SimpleTemplateEngine()
@@ -34,7 +35,9 @@ log.info "======="
 log.info ""
 log.info "[Target]"
 log.info "Target anat: $params.target_anat"
-log.info "Resampling: $params.resampling"
+log.info "Resampling (Streamlines): $params.resampling_streamlines"
+log.info "Resampling (Tractograms): $params.resampling_tractograms"
+
 log.info ""
 
 workflow.onComplete {
@@ -101,7 +104,8 @@ process Register_Streamlines {
 
     input:
     set sid, file(tractogram), file(affine), file(inverse_warp), file(target_anat) from tractogram_registration
-    val resampling from params.resampling
+    val resampling_streamlines from params.resampling_streamlines
+    val resampling_tractograms from params.resampling_tractograms
 
     output:
     file "${sid}_registered_*"
@@ -110,13 +114,17 @@ process Register_Streamlines {
     """
     for f in ${tractogram}
     do 
-        if [[ ${resampling} -ge 3 ]]; then
-           scil_resample_streamlines.py \$f \$f --nb_pts_per_streamline ${resampling} -f
+        if [[ ${resampling_tractograms} -ge 1 ]]; then
+           scil_resample_tractogram.py \$f ${resampling_tractograms} \$f -f -v
         fi
 
         scil_apply_transform_to_tractogram.py \$f ${target_anat} \
         ${affine} ${sid}_registered_\$f \
         --inverse --in_deformation ${inverse_warp} -f -vv
+
+        if [[ ${resampling_streamlines} -ge 3 ]]; then
+           scil_resample_streamlines.py ${sid}_registered_\$f ${sid}_registered_\$f --nb_pts_per_streamline ${resampling_streamlines} -f
+        fi
     done
     """
 }
