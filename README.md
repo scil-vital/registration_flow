@@ -1,4 +1,4 @@
-# FINTA pipeline
+# Registration Flow
 ===================
 
 
