@@ -16,7 +16,7 @@ if(params.help) {
     return
 }
 
-log.info "FINTA Multibundles Flow"
+log.info "Registration Flow"
 log.info "==============================================="
 log.info ""
 log.info "Start time: $workflow.start"
@@ -64,9 +64,9 @@ Channel
     .set{ tractogram } // [sid, tractogram.trk]
 
 Channel
-    .fromPath("$root/**/metrics/*.nii.gz")
+    .fromFilePairs("$root/**/metrics/*.nii.gz", size: 1)
     .map{[it.parent.parent.name, it]}
-    .set{ reference } // [sid, t1.nii.gz]
+    .set{ reference } // [sid, metric.nii.gz]
 
 target_anat = Channel.fromPath("$params.target_anat")
 
@@ -83,7 +83,7 @@ process Register_Anat {
     set sid, file(reference), file(target_anat), val(registration_script) from reference_target_anat
 
     output:
-    // [sid, affine.mat, inverseWarp.nii.gz, fixed_t1.nii.gz]
+    // [sid, affine.mat, inverseWarp.nii.gz, fixed_metric.nii.gz]
     set sid, "${sid}__output0GenericAffine.mat", "${sid}__output1InverseWarp.nii.gz", "${target_anat}" into transformation_for_tractogram
     file "${sid}__outputWarped.nii.gz"
     file "${sid}__outputInverseWarped.nii.gz"

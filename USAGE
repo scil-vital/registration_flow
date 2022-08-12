@@ -12,14 +12,15 @@ DESCRIPTION
 
                                         [root]
                                         ├── S1
-                                        │   ├── metrics
-                                        |   |   └── t1.nii.gz
+                                        │   ├── metrics (1 file only)
+                                        |   |   └── *.nii.gz
                                         │   └── bundles
                                         |       └── *.trk
                                         └── S2
                                             └── *
 
-    --target_anat                        Path to reference anatomy of the atlas
+    --target_anat                        Path to reference anatomy of the atlas (be sure the modality is the
+                                         same as the metric for accurate registration)
 
     OPTIONAL ARGUMENTS (current value)
 
