@@ -113,22 +113,24 @@ process Register_Streamlines {
     val resampling_tractograms from params.resampling_tractograms
 
     output:
-    file "${sid}_registered_*"
+    file "*_registered.trk"
 
     script:
     """
     for f in ${tractogram}
     do 
+        filename=\$(basename -- "\$f")
+        root_name="\${filename%.*}"
         if [[ ${resampling_tractograms} -ge 1 ]]; then
            scil_resample_tractogram.py \$f ${resampling_tractograms} \$f -f -v
         fi
 
         scil_apply_transform_to_tractogram.py \$f ${target_anat} \
-        ${affine} ${sid}_registered_\$f \
+        ${affine} \${root_name}_registered.trk \
         --inverse --in_deformation ${inverse_warp} -f -vv
 
         if [[ ${resampling_streamlines} -ge 3 ]]; then
-           scil_resample_streamlines.py ${sid}_registered_\$f ${sid}_registered_\$f --nb_pts_per_streamline ${resampling_streamlines} -f
+           scil_resample_streamlines.py \${root_name}_registered.trk \${root_name}_registered.trk --nb_pts_per_streamline ${resampling_streamlines} -f
         fi
     done
     """
