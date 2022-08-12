@@ -64,15 +64,17 @@ Channel
     .set{ tractogram } // [sid, tractogram.trk]
 
 Channel
-    .fromFilePairs("$root/**/metrics/*.nii.gz", size: 1)
-    .map{[it.parent.parent.name, it]}
-    .set{ reference } // [sid, metric.nii.gz]
+    .fromFilePairs("$root/**/metrics/*.nii.gz", size: -1) { it.parent.parent.name }
+    .into{ reference; reference_for_check } // [sid, ref.nii.gz]
+
+num_ref = reference_for_check.map { [it[0], it[1].size()] }
 
 target_anat = Channel.fromPath("$params.target_anat")
 
 reference
     .combine(target_anat)
     .combine(registration_script)
+    .join(num_ref)
     .set{reference_target_anat} 
 
 process Register_Anat {
@@ -80,14 +82,17 @@ process Register_Anat {
     memory '2 GB'
 
     input:
-    set sid, file(reference), file(target_anat), val(registration_script) from reference_target_anat
+    set sid, file(reference), file(target_anat), val(registration_script), val(number_of_ref) from reference_target_anat
 
     output:
-    // [sid, affine.mat, inverseWarp.nii.gz, fixed_metric.nii.gz]
+    // [sid, affine.mat, inverseWarp.nii.gz, fixed_ref.nii.gz]
     set sid, "${sid}__output0GenericAffine.mat", "${sid}__output1InverseWarp.nii.gz", "${target_anat}" into transformation_for_tractogram
     file "${sid}__outputWarped.nii.gz"
     file "${sid}__outputInverseWarped.nii.gz"
     file "${sid}__output1Warp.nii.gz"
+
+    when:
+    number_of_ref == 1
 
     script:
     """
